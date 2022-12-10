@@ -1,0 +1,39 @@
+Задание №1
+Напишите запрос, который выведет пилотов, которые в качестве второго пилота в августе этого года трижды ездили в аэропорт Шереметьево.
+
+SELECT p.name
+FROM flights as f LEFT JOIN pilots as p on f.second_pilot_id=p.pilot_id
+WHERE DATE_TRUNC('month', f.flight_dt::date) = '2022-08-01'
+AND destination = 'Шереметьево'
+group by p.name
+having count(*) = 3
+
+Задание №2
+Выведите пилотов старше 45 лет, совершали полеты на самолетах с количеством пассажиров больше 30.
+
+select p.name
+from flights as f LEFT JOIN pilots as p on f.first_pilot_id=p.pilot_id
+left join planes as pl on f.plane_id=pl.plane_id
+WHERE p.age > 45
+AND pl.cargo_flg = 0
+AND f.quantity > 30
+union
+select p.name
+from flights as f LEFT JOIN pilots as p on f.second_pilot_id=p.pilot_id
+left join planes as pl on f.plane_id=pl.plane_id
+WHERE p.age > 45
+AND pl.cargo_flg = 0
+AND f.quantity > 30
+
+#поскольку в задании не сказано каких именно пилотов требуется вывести первых(first_pilot_id) или вторых(second_pilot_id), посчитал и тех и тех, а затем склеил и вывел 
+
+Задание №3
+Выведите ТОП 10 пилотов-капитанов (first_pilot_id), которые совершили наибольшее число грузовых перелетов в этом году.
+
+select p.name
+from flights as f LEFT Join pilots as p on f.first_pilot_id=p.pilot_id
+left join planes as pl on f.plane_id=pl.plane_id
+WHERE pl.cargo_flg = 1
+GROUP BY p.pilot_id
+ORDER BY COUNT(*) DESC
+LIMIT 10;
